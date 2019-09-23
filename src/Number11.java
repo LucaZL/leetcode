@@ -9,7 +9,7 @@ public class Number11 {
         int fence = 0;
         int maxArea = 0;
         while(i < j) {
-            if(fence < height[i] || fence < height[j]) {
+            if(fence <= height[i] && fence <= height[j]) {
                 fence = Math.min(height[i], height[j]);
                 int area = fence * (j - i);
                 if(maxArea < area) maxArea = area;
