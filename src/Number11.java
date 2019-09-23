@@ -5,6 +5,25 @@ public class Number11 {
     }
 
     private static int maxArea(int[] height) {
+        int i=0, j = height.length - 1;
+        int fence = 0;
+        int maxArea = 0;
+        while(i < j) {
+            if(fence < height[i] || fence < height[j]) {
+                fence = Math.min(height[i], height[j]);
+                int area = fence * (j - i);
+                if(maxArea < area) maxArea = area;
+            }
+            if(height[i] < height[j]) {
+                i++;
+            }else{
+                j--;
+            }
+        }
+        return maxArea;
+    }
+
+    private static int maxArea1(int[] height) {
         int result = 0;
         int last_left_max = height[0];
         for(int i=0;i<height.length-1;i++) {
