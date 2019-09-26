@@ -3,33 +3,42 @@ import java.util.stream.IntStream;
 
 public class Number15 {
     public static void main(String[] args) {
-        int[] nums = {-1, 0, 1, 2, -1, -4};
+        int[] nums = {-5,1,-3,-1,-4,-2,4,-1,-1};
         System.out.println(threeSum(nums));
     }
 
     private static List<List<Integer>> threeSum(int[] nums) {
         List<List<Integer>> result = new ArrayList<>();
         List<Integer> result_element = null;
+//        Arrays.sort(nums);
+//
+//        for(int i=0;i<nums.length;i++)
 
-        List<Integer> negative_list = new ArrayList<>();
-        List<Integer> positive_list = new ArrayList<>();
+
+//
+//        List<Integer> negative_list = new ArrayList<>();
+//        List<Integer> positive_list = new ArrayList<>();
         int zeor_cout = 0;
         boolean ifContainsZero = false;
         Set<Integer> set = new HashSet<>();
 
         int nums_len = nums.length;
         Arrays.sort(nums);
+//        System.out.println(Arrays.toString(nums));
         int num;
+        int negative_end_index = 0, positive_start_index = -1;
         for(int i = 0;i<nums_len;i++) {
             num = nums[i];
             set.add(-num);
             if(num < 0) {
-                negative_list.add(num);
+                negative_end_index++;
             }else if(num == 0) {
                 zeor_cout++;
                 ifContainsZero = true;
             }else{
-                positive_list.add(num);
+                if(positive_start_index < 0) {
+                    positive_start_index = i;
+                }
             }
         }
 
@@ -40,52 +49,80 @@ public class Number15 {
             result_element.add(0);
             result.add(result_element);
         }
-
+//        System.out.println(negative_end_index + "," + positive_start_index);
         int last_i = 0, last_j = 0;
-        for(int i=0;i<positive_list.size();i++) {
-            if(last_i == positive_list.get(i)) continue;
-            last_i = positive_list.get(i);
-            for(int j=i+1;j<positive_list.size();j++) {
-                if(last_j == positive_list.get(j)) continue;
-                last_j = positive_list.get(j);
-                int sum = positive_list.get(i) + positive_list.get(j);
-                if(set.contains(sum)) {
-                    result_element = new ArrayList<>();
-                    result_element.add(positive_list.get(i));
-                    result_element.add(positive_list.get(j));
-                    result_element.add(-sum);
-                    result.add(result_element);
-                }
+        int num_ele_i, num_ele_j, index_end_j = negative_end_index;
+        boolean ifNegative = true;
+        for(int i=0;i<nums_len;i++) {
+            num_ele_i = nums[i];
+//            System.out.println("first num i="+i+",num_ele_i="+num_ele_i);
+            if(last_i == num_ele_i) {
+                continue;
             }
-            last_j= 0;
-        }
-        last_i = 0; last_j = 0;
-        for(int i=0;i<negative_list.size();i++) {
-            if(last_i == negative_list.get(i)) continue;
-            last_i = negative_list.get(i);
-            if(ifContainsZero) {
-                if(set.contains(negative_list.get(i))) {
+            last_i = num_ele_i;
+            if(ifContainsZero && i < negative_end_index) {
+                if(set.contains(num_ele_i)) {
                     result_element = new ArrayList<>();
-                    result_element.add(negative_list.get(i));
+                    result_element.add(num_ele_i);
                     result_element.add(0);
-                    result_element.add(-negative_list.get(i));
+                    result_element.add(-num_ele_i);
                     result.add(result_element);
                 }
             }
-            for(int j=i+1;j<negative_list.size();j++) {
-                if(last_j == negative_list.get(j)) continue;
-                last_j = negative_list.get(j);
-                int sum = negative_list.get(i) + negative_list.get(j);
+
+//            System.out.println("i="+i+",index_end="+index_end_j);
+            for(int j=i+1;j<index_end_j;j++) {
+                num_ele_j = nums[j];
+//                System.out.println("nums: i="+ num_ele_i+",j="+num_ele_j);
+                if(last_j == num_ele_j) continue;
+                last_j = num_ele_j;
+                int sum = num_ele_i + num_ele_j;
                 if(set.contains(sum)) {
                     result_element = new ArrayList<>();
-                    result_element.add(negative_list.get(i));
-                    result_element.add(negative_list.get(j));
+                    result_element.add(num_ele_i);
+                    result_element.add(num_ele_j);
                     result_element.add(-sum);
                     result.add(result_element);
                 }
             }
             last_j= 0;
+            if(ifNegative && i < nums_len-1 && nums[i+1] >= 0) {    // change to positive
+                ifNegative = false;
+                i = positive_start_index-1;
+                index_end_j = nums_len;
+                last_i = 0;
+            }
         }
+//        last_i = 0; last_j = 0;
+//        for(int i=0;i<negative_end_index;i++) {
+//            int num_ele_i = nums[i];
+//            if(last_i == num_ele_i) continue;
+//            last_i = num_ele_i;
+//            if(ifContainsZero) {
+//                if(set.contains(num_ele_i)) {
+//                    result_element = new ArrayList<>();
+//                    result_element.add(num_ele_i);
+//                    result_element.add(0);
+//                    result_element.add(-num_ele_i);
+//                    result.add(result_element);
+//                }
+//            }
+//            for(int j=i+1;j<negative_end_index;j++) {
+//                int num_ele_j = nums[j];
+//                if(last_j == num_ele_j) continue;
+//                last_j = num_ele_j;
+//                int sum =num_ele_i + num_ele_j;
+////                System.out.println(num_ele_i+","+num_ele_j+","+sum);
+//                if(set.contains(sum)) {
+//                    result_element = new ArrayList<>();
+//                    result_element.add(num_ele_i);
+//                    result_element.add(num_ele_j);
+//                    result_element.add(-sum);
+//                    result.add(result_element);
+//                }
+//            }
+//            last_j= 0;
+//        }
 
 
 //        List<List<Integer>> result = new ArrayList();
