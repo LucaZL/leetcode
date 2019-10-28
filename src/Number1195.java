@@ -4,10 +4,12 @@ import java.util.function.IntConsumer;
 public class Number1195 {
     private int n;
     private Semaphore semaphore = new Semaphore(1);
-    private Semaphore semaphoreNumber = new Semaphore(1);
+    private Semaphore semaphoreNumber = new Semaphore(0);
     private Semaphore semaphore3 = new Semaphore(0);
     private Semaphore semaphore5 = new Semaphore(0);
     private Semaphore semaphore15 = new Semaphore(0);
+
+    volatile private int cur = 1;
 
     public Number1195(int n) {
         this.n = n;
@@ -15,9 +17,9 @@ public class Number1195 {
 
     // printFizz.run() outputs "fizz".
     public void fizz(Runnable printFizz) throws InterruptedException {
-        for(int i = 3; i <= n; i += 3) {
-            if(i % 5 == 0) continue;
+        while (true) {
             semaphore3.acquire();
+            if(cur > n) break;
             printFizz.run();
             semaphoreNumber.release();
         }
@@ -25,9 +27,9 @@ public class Number1195 {
 
     // printBuzz.run() outputs "buzz".
     public void buzz(Runnable printBuzz) throws InterruptedException {
-        for(int i = 5; i <= n; i += 5) {
-            if(i % 3 == 0) continue;
+        while(true) {
             semaphore5.acquire();
+            if(cur > n) break;
             printBuzz.run();
             semaphoreNumber.release();
         }
@@ -35,8 +37,9 @@ public class Number1195 {
 
     // printFizzBuzz.run() outputs "fizzbuzz".
     public void fizzbuzz(Runnable printFizzBuzz) throws InterruptedException {
-        for (int i=15;i<=n;i+=15) {
+        while (true) {
             semaphore15.acquire();
+            if(cur > n) break;
             printFizzBuzz.run();
             semaphoreNumber.release();
         }
@@ -44,17 +47,25 @@ public class Number1195 {
 
     // printNumber.accept(x) outputs "x", where x is an integer.
     public void number(IntConsumer printNumber) throws InterruptedException {
-        for(int i = 1; i <= n; i++) {
-            semaphoreNumber.acquire();
-            if(i % 3 ==0 && i % 5 == 0) {
+        while(true) {
+            if(cur % 15 == 0) {
                 semaphore15.release();
-            }else if(i % 3 == 0) {
+                semaphoreNumber.acquire();
+            }else if(cur % 3 == 0) {
                 semaphore3.release();
-            }else if(i % 5 == 0) {
+                semaphoreNumber.acquire();
+            }else if(cur % 5 == 0) {
                 semaphore5.release();
+                semaphoreNumber.acquire();
             }else {
-                printNumber.accept(i);
-                semaphoreNumber.release();
+                printNumber.accept(cur);
+            }
+            cur++;
+            if(cur > n) {
+                semaphore3.release();
+                semaphore5.release();
+                semaphore15.release();
+                break;
             }
         }
     }
